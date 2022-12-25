@@ -1,0 +1,167 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jenkins-slave
+  namespace: ops
+spec:
+  replicas: 1 
+  selector: 
+    matchLabels: 
+      app: jenkins-slave 
+  template: 
+    metadata: 
+      labels:   
+        app: jenkins-slave 
+    spec: 
+      securityContext: 
+        runAsUser: 0 
+        runAsGroup: 0 
+        fsGroup: 0 
+      serviceAccountName: jenkins-admin 
+      containers: 
+        - name: jenkins 
+          image: mohab5897/jenkinsag 
+          ports: 
+            - name: httpport 
+              containerPort: 8080 
+            - name: jnlpport 
+              containerPort: 50000 
+          volumeMounts: 
+            - name: jenkins-data 
+              mountPath: /var/jenkins_home 
+            - name: docker-daemon-volume 
+              mountPath: /var/run/docker.sock 
+ 
+      volumes: 
+        - name: jenkins-data 
+          persistentVolumeClaim: 
+            claimName: my-pvc-2
+
+        - name: docker-daemon-volume
+          hostPath:
+            path: /var/run/docker.sock
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc-2
+  namespace: ops 
+spec: 
+  resources: 
+    requests: 
+      storage: 10Gi 
+  accessModes: 
+    - ReadWriteOnce
+  volumeMode: Filesystem
+
+  storageClassName: slow
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-slave-service
+  namespace: ops
+spec:
+  type: ClusterIP
+  ports:
+    - port: 22
+      targetPort: 22
+
+  selector:
+    app: jenkins-slave
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: jenkins-slave
+#   namespace: ops
+# spec:
+#   replicas: 1 
+#   selector: 
+#     matchLabels: 
+#       app: jenkins-slave 
+#   template: 
+#     metadata: 
+#       labels: 
+#         app: jenkins-slave 
+#     spec: 
+#       securityContext: 
+#         runAsUser: 0 
+#         runAsGroup: 0 
+#         fsGroup: 0 
+#       serviceAccountName: jenkins-admin 
+#       initContainers:
+#       - name: install-kubectl
+#         image: allanlei/kubectl
+#         volumeMounts:
+#         - name: kubectl
+#           mountPath: /data
+#         command: ["cp", "/usr/local/bin/kubectl", "/data/kubectl"]
+#       - name: docker
+#         image: docker:stable
+#         volumeMounts:
+#         - name: docker
+#           mountPath: /data
+#         command: ["cp", "/usr/local/bin/docker", "/data/docker"]
+#       containers: 
+#         - name: jenkins 
+#           image: jenkins/ssh-agent
+#           ports: 
+#             - name: httpport 
+#               containerPort: 8080 
+#             - name: jnlpport 
+#               containerPort: 50000 
+#           volumeMounts: 
+#             - name: docker
+#               mountPath: /usr/local/bin/docker
+#               subPath: "docker"
+#             - name: kubectl
+#               mountPath: /usr/local/bin/kubectl
+#               subPath: "kubectl"
+            
+#             - name: jenkins-data 
+#               mountPath: /var/jenkins_home 
+#             - name: docker-daemon-volume 
+#               mountPath: /var/run/docker.sock 
+ 
+#       volumes: 
+#         - name: jenkins-data 
+#           persistentVolumeClaim: 
+#             claimName: my-pvc-2
+#         - name: kubectl
+#           emptyDir: {}
+#         - name: docker
+#           emptyDir: {}
+#         - name: docker-daemon-volume
+#           hostPath:
+#             path: /var/run/docker.sock
+# ---
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: my-pvc-2
+#   namespace: ops 
+# spec: 
+#   resources: 
+#     requests: 
+#       storage: 10Gi 
+#   accessModes: 
+#     - ReadWriteOnce
+#   volumeMode: Filesystem
+
+#   storageClassName: slow
+# ---
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: jenkins-slave-service
+#   namespace: ops
+# spec:
+#   type: ClusterIP
+#   ports:
+#     - port: 22
+#       targetPort: 22
+
+#   selector:
+#     app: jenkins-slave
