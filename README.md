@@ -4,10 +4,11 @@
  - a Google Cloud Platform Infrastructure 
  - Google Kubernetes Engine
  - Jenkins nodes master and slave on kubernetes
- - 2 branch git repo application master and dev
+ - 3 branch git repo application main, blue and green
  - Multi branch pipeline
  ##  idea and automation :
- -terraform is used to spin up a fully private infrastructure with Google kubernetes engine on Google Cloud, then a bastion host is used to connect to kubernetes engine and deploy jenkins master and slave, after that jenkins multibranch pipeline is used, the 1st branch "master" is used to create an application image from a dockerfile that is present on the app git repo, after that, the 2nd branch is used to deploy the last image created by 1st branch on the same kubernetes cluster on GCP.
+ -terraform is used to spin up a fully private infrastructure with Google kubernetes engine on Google Cloud, then a bastion host is used to connect to kubernetes engine and deploy jenkins master and slave, after that jenkins multibranch pipeline is used, the branch "main" is used for development 
+ "blue" and "green" branches are used to create an application image from a dockerfile that is present on the application git repo to implement blue green deplyment strategy.
 
 ## Demo
 
@@ -35,7 +36,7 @@ this Repo : https://github.com/mohab58977/react-task contains Application, Docke
 
 ## Deployment files
 
-- Ideployment files (deploy.yaml & service.yaml) Jenkins will deploy these files on GKE cluster
+- Ideployment files (blue.yaml & green.yaml & service.yaml) Jenkins will deploy these files on GKE cluster
 
 
 
