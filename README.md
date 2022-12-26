@@ -1,5 +1,8 @@
 
 # CICD Pipeline
+ ## links
+ jenkins at http://35.246.194.209:8080/
+ app at http://34.159.17.155:3000/
  ## the project consists of :
  - a Google Cloud Platform Infrastructure 
  - Google Kubernetes Engine
